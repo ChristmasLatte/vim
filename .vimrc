@@ -1,5 +1,5 @@
 " File              : .vimrc"
-" Author            : quan yizhuo"
+ "Author            : quan yizhuo"
 " Date              : 2022-07-09"
 " Last Modified Date: 2022-07-09"
 " Last Modified By  : quan yizhuo"
@@ -8,9 +8,14 @@
 set nocompatible
 " 不忽略大小写
 set noic
-
+" 允许使用backspace delete
+set backspace=2
 " 设置背景配色
 set background=dark
+
+" 关闭出现的乱码
+let &t_TI = ""
+let &t_TE = ""
 
 " 设置文件编码
 set encoding=utf-8
@@ -30,7 +35,8 @@ set hlsearch
 
 " 设置终端下开启全部颜色
 set t_Co=256
-
+" set t_ut=
+" colorscheme codedark
 "设置一个tab缩进4个空格
 set tabstop=4
 
@@ -63,7 +69,56 @@ set statusline+=%#warningmsg#
 set statusline+=%*
 
 
-" 将前缀键定义为逗号，pymode插件中的一些快捷键会用到
+"新建py文件时自动插入文件头
+" au BufNewFile *.py 0r ~/.vim/templates/python-header.template
+
+autocmd BufNewFile *.py,*.sh exec ":call SetComment()"
+" 新建文件后自动定位到文件末尾
+autocmd BufNewFile * normal G
+
+func SetComment()
+    if expand("%:e") == 'py'
+        call setline(1, '#!/usr/bin/env python')
+        call setline(2, '# -*- coding: utf-8 -*-')
+        call append(line(".")+1, "# File Name:     ".expand("%"))
+        call append(line(".")+2, "# Author:        Yizhuo Quan")
+        call append(line(".")+3, "# Created Time:  ".strftime("%Y-%m-%d  %H:%M"))
+        call append(line(".")+4, "# Last Modified: <none>-<none>")
+    endif
+endfunc
+
+
+" 插入修改时间
+func SetLastModifiedTime(lineno)
+        let modif_time = strftime("%Y-%m-%d  %H:%M")
+        let line = '# Last Modified: '.modif_time
+        call setline(6, line) "此处行号为要显示行号（绝对行号
+        call append(a:lineno, line)
+
+"       if a:lineno == "-1"
+"               let line = getline(5)   "此处行号要和上面create time行号对应
+"       else
+"                let line = getline(a:lineno)
+"        endif    
+"        if line =~ '^\sLast Modified'
+"                let line = substitute( line,':\s\+.*\d\{4\}', ':'.modif_time, "" )
+"        else
+"                let line = '# Last Modified:'.modif_time
+"        endif
+"        if a:lineno == "-1"
+"                call setline(6, line) "此处行号为要显示行号（绝对行号）
+"        else
+"                call append(a:lineno, line)
+"                call setline(6, line) "此处行号为要显示行号（绝对行号）
+"                call setline(6, line) "此处行号为要显示行号（绝对行号）
+"        endif
+endfunc
+ 
+" map the SetLastModifiedTime command automatically
+
+au BufWrite *.py call SetLastModifiedTime(-1)
+
+
 let mapleader=","
 
 
@@ -74,15 +129,42 @@ call pathogen#infect()
 " 启用安装的插件自己的说明文档
 call pathogen#helptags()
 
+" now let's use vundle for plugin-manger  2022-07-11
+filetype off
+" 设置包括vundle和初始化相关的runtime path
+" set rtp+=~/.vim/bundle/Vundle.vim
+" call vundle#begin()
+" 让vundle管理插件版本,必须
+
+"call vundle#begin()
+"  Plugin 'VundleVim/Vundle.vimi'
+"  Plugin 'preservim/nerdtree'
+"  Plugin 'Valloric/YouCompleteMe'
+"  Plugin 'dense-analysis/ale'
+"call vundle#end()
+" filetype plugin indent on
+" 必须 加载vim自带和插件相应的语法和文件类型相关脚本
+" 忽视插件改变缩进,可以使用以下替代:
+"filetype plugin on
+
+" YouCompleteMe 设置
+let g:ycm_global_ycm_extra_conf='~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py'
+let g:ycm_confirm_extra_conf=0
+let g:ycm_python_binary_path  = '/home/qyz/anaconda3/envs/pytorch/bin/python3.7'
+" 禁用语法检查
+let g:ycm_show_diagnostics_ui = 0
+" let g:ycm_enable_diagnostic_highlighting = 0
+" disable function signature
+" let g:ycm_autoclose_preview_window_after_completion=1
 " jedi-vim's setting
 " disable the auto-initialization
 " let g:jedi#auto_initialization = 0
 " 输入小数点时自动开始补全提示
-let g:jedi#popup_on_dot = 1
+" let g:jedi#popup_on_dot = 1
 " 不显示函数签名
-let g:jedi#show_call_signatures = "2"
+" let g:jedi#show_call_signatures = "2"
 " Crtl+N 主动补全
-let g:jedi#completions_command = "<C-N>"
+" let g:jedi#completions_command = "<C-N>"
 
 " let g:ale_linters = {'python': ['flake8']}
 
