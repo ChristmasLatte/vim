@@ -156,7 +156,11 @@ let g:ycm_show_diagnostics_ui = 0
 " let g:ycm_enable_diagnostic_highlighting = 0
 " disable function signature
 " let g:ycm_autoclose_preview_window_after_completion=1
+
+
 " jedi-vim's setting
+" 禁用jedi-vim的自动补全，保留其他功能
+let g:jedi#completions_enabled = 0
 " disable the auto-initialization
 " let g:jedi#auto_initialization = 0
 " 输入小数点时自动开始补全提示
